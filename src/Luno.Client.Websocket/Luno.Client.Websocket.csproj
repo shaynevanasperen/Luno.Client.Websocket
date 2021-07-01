@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net5.0</TargetFrameworks>
+		<Description>Client for Luno websocket API</Description>
+		<PackageTags>Luno websockets websocket client cryptocurrency exchange</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Reactive" Version="5.0.0" />
+		<PackageReference Include="Websocket.Client" Version="4.3.32" />
+	</ItemGroup>
+</Project>

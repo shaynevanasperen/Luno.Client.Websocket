@@ -1,0 +1,61 @@
+<Project>
+
+	<PropertyGroup>
+		<Authors>Shayne van Asperen</Authors>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<LangVersion>latest</LangVersion>
+		<Nullable>enable</Nullable>
+		<DebugType>embedded</DebugType>
+		<Deterministic>true</Deterministic>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<ContinuousIntegrationBuild Condition="'$(APPVEYOR_BUILD_NUMBER)' != ''">true</ContinuousIntegrationBuild>
+		<IsTestProject>$(MSBuildProjectName.EndsWith('Tests'))</IsTestProject>
+		<IsSampleProject>$(MSBuildProjectName.StartsWith('Sample'))</IsSampleProject>
+		<IsPackable>false</IsPackable>
+		<IsPackable Condition="!$(IsTestProject) AND !$(IsSampleProject)">true</IsPackable>
+		<NotNCrunch>false</NotNCrunch>
+		<NotNCrunch Condition="'$(NCrunch)' == ''">true</NotNCrunch>
+		<GenerateDocumentationFile Condition="$(NotNCrunch)">$(IsPackable)</GenerateDocumentationFile>
+		<GeneratePackageOnBuild Condition="$(NotNCrunch)">$(IsPackable)</GeneratePackageOnBuild>
+		<SignAssembly Condition="$(GeneratePackageOnBuild)">true</SignAssembly>
+		<AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)Luno.Client.Websocket.snk</AssemblyOriginatorKeyFile>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/shaynevanasperen/Luno.Client.Websocket</PackageProjectUrl>
+		<PackageIcon>Luno.png</PackageIcon>
+		<PackageIconUrl>https://raw.githubusercontent.com/shaynevanasperen/Luno.Client.Websocket/master/Luno.png</PackageIconUrl>
+		<RepositoryUrl>https://github.com/shaynevanasperen/Luno.Client.Websocket.git</RepositoryUrl>
+		<RepositoryType>Git</RepositoryType>
+		<APPVEYOR_BUILD_NUMBER Condition="'$(APPVEYOR_BUILD_NUMBER)' == ''">0</APPVEYOR_BUILD_NUMBER>
+		<MinVerTagPrefix>$(MSBuildProjectName).</MinVerTagPrefix>
+		<NoWarn Condition="$(IsTestProject)">$(NoWarn);CA1034;CA1051;CA1307;CA1822;CA2007;IDE0051</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Condition="$(NotNCrunch) AND $(IsPackable)" Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+		<PackageReference Condition="$(NotNCrunch) AND $(IsPackable)" Include="MinVer" Version="2.5.0" PrivateAssets="All" />
+		<PackageReference Condition="$(IsTestProject)" Include="FluentAssertions" Version="5.10.3" />
+		<PackageReference Condition="$(IsTestProject)" Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+		<PackageReference Condition="$(IsTestProject)" Include="NSubstitute" Version="4.2.2" />
+		<PackageReference Condition="$(IsTestProject)" Include="Serilog" Version="2.10.0" />
+		<PackageReference Condition="$(IsTestProject)" Include="Specify" Version="3.0.0" />
+		<PackageReference Condition="$(IsTestProject)" Include="TestStack.BDDfy.Xunit" Version="1.2.0" />
+		<PackageReference Condition="$(IsTestProject)" Include="xunit" Version="2.4.1" />
+		<PackageReference Condition="$(IsTestProject)" Include="xunit.runner.visualstudio" Version="2.4.3" PrivateAssets="All" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Condition="$(IsPackable)" Include="$(MSBuildThisFileDirectory)Luno.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<SourceRoot Include="$(MSBuildThisFileDirectory)/" />
+	</ItemGroup>
+
+	<Target Name="FileVersion" AfterTargets="MinVer">
+		<PropertyGroup>
+			<BUILD_NUMBER Condition="'$(BUILD_NUMBER)' == ''">0</BUILD_NUMBER>
+			<FileVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch).$(BUILD_NUMBER)</FileVersion>
+		</PropertyGroup>
+	</Target>
+
+</Project>
