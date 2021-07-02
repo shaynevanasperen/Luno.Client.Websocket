@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
-using Luno.Client.Websocket.Messages;
+using System.Text.Json.Serialization;
+using Luno.Client.Websocket.Json;
+using Luno.Client.Websocket.Models;
 
 namespace Luno.Client.Websocket.Responses
 {
 	/// <summary>
 	/// Order book snapshot message.
 	/// </summary>
-	public record OrderBookDiffResponse : MessageBase
+	public record OrderBookDiffResponse : Message
 	{
 		/// <summary>
 		/// The asks.
@@ -28,6 +30,12 @@ namespace Luno.Client.Websocket.Responses
 		/// The status update.
 		/// </summary>
 		public PairStatus? StatusUpdate { get; init; }
+
+		/// <summary>
+		/// The timestamp.
+		/// </summary>
+		[JsonConverter(typeof(DateTimeIntegerMillisecondsConverter))]
+		public DateTime Timestamp { get; init; }
 	}
 
 	/// <summary>

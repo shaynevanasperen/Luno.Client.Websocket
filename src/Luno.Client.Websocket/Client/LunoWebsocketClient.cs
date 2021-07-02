@@ -1,7 +1,10 @@
 using System;
+using System.Net.WebSockets;
 using System.Text.Json;
 using Luno.Client.Websocket.Json;
-using Luno.Client.Websocket.Messages;
+using Luno.Client.Websocket.Models;
+using Luno.Client.Websocket.Requests;
+using Luno.Client.Websocket.Responses;
 using Websocket.Client;
 
 namespace Luno.Client.Websocket.Client
@@ -12,23 +15,57 @@ namespace Luno.Client.Websocket.Client
 	/// </summary>
 	public class LunoWebsocketClient : IDisposable
 	{
-		readonly IWebsocketClient _client;
+		/// <summary>
+		/// Creates a real live websocket connection to Luno.
+		/// </summary>
+		/// <param name="pair">The trading pair with which all messages are concerned.</param>
+		/// <param name="secrets">The secrets.</param>
+		/// <returns>A connected Luno websocket client.</returns>
+		public static LunoWebsocketClient Create(string pair, LunoSecrets secrets)
+		{
+			const string baseAddress = "wss://ws.luno.com/api/1/stream/";
+
+			var websocketClient = new WebsocketClient(new Uri($"{baseAddress}{pair}", UriKind.Absolute), () => new ClientWebSocket()
+				.WithKeepAliveInterval(TimeSpan.FromSeconds(3)))
+			{
+				Name = $"Luno ({pair})"
+			};
+
+			var client = new LunoWebsocketClient(websocketClient, pair);
+
+			websocketClient.ReconnectionHappened.Subscribe(_ => client.Send(new AuthenticationRequest(secrets.ApiKey, secrets.ApiSecret)));
+
+			return client;
+		}
+
 		readonly IDisposable _clientMessageReceivedSubscription;
 
 		/// <summary>
 		/// Creates a new instance.
 		/// </summary>
 		/// <param name="client">The client to use for the websocket.</param>
-		public LunoWebsocketClient(IWebsocketClient client)
+		/// <param name="targetPair">The target pair.</param>
+		public LunoWebsocketClient(IWebsocketClient client, string targetPair)
 		{
-			_client = client;
-			_clientMessageReceivedSubscription = _client.MessageReceived.Subscribe(HandleMessage);
+			Client = client;
+			TargetPair = targetPair;
+			_clientMessageReceivedSubscription = Client.MessageReceived.Subscribe(HandleMessage);
 		}
+
+		/// <summary>
+		/// The websocket client.
+		/// </summary>
+		public IWebsocketClient Client { get; }
+
+		/// <summary>
+		/// The trading pair with which all messages are concerned.
+		/// </summary>
+		public string TargetPair { get; }
 
 		/// <summary>
 		/// Provided message streams
 		/// </summary>
-		public LunoClientStreams ClientStreams { get; } = new();
+		public LunoClientStreams Streams { get; } = new();
 
 		/// <summary>
 		/// Cleanup everything
@@ -42,7 +79,7 @@ namespace Luno.Client.Websocket.Client
 		public void Send<T>(T request)
 		{
 			var serialized = JsonSerializer.Serialize(request, LunoJsonOptions.Default);
-			_client.Send(serialized);
+			Client.Send(serialized);
 		}
 
 		void HandleMessage(ResponseMessage message)
@@ -64,11 +101,10 @@ namespace Luno.Client.Websocket.Client
 			throw new Exception($"Unhandled response:  '{messageSafe}'");
 		}
 
-		bool HandleRawMessage(string message)
+		bool HandleRawMessage(string _)
 		{
-			var response = JsonSerializer.Deserialize<JsonElement>(message, LunoJsonOptions.Default);
-
-			return MessageBase.TryHandle(response, ClientStreams.KeepAliveSubject);
+			Streams.KeepAliveSubject.OnNext(new KeepAliveResponse());
+			return true;
 		}
 
 		bool HandleObjectMessage(string message)
@@ -76,12 +112,12 @@ namespace Luno.Client.Websocket.Client
 			var response = JsonSerializer.Deserialize<JsonElement>(message, LunoJsonOptions.Default);
 
 			if (response.TryGetProperty("trade_updates", out _))
-				return MessageBase.TryHandle(response, ClientStreams.OrderBookDiffSubject);
+				return Message.TryHandle(response, Streams.OrderBookDiffSubject);
 
-			if (response.TryGetProperty("status", out _))
-				return MessageBase.TryHandle(response, ClientStreams.OrderBookSnapshotSubject);
+			if (response.TryGetProperty("asks", out _))
+				return Message.TryHandle(response, Streams.OrderBookSnapshotSubject);
 
-			return MessageBase.TryHandle(response, ClientStreams.KeepAliveSubject);
+			return Message.TryHandle(response, Streams.KeepAliveSubject);
 		}
 	}
 }

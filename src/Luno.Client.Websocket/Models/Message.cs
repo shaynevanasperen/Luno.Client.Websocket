@@ -1,13 +1,14 @@
+using System;
 using System.Reactive.Subjects;
 using System.Text.Json;
 using Luno.Client.Websocket.Json;
 
-namespace Luno.Client.Websocket.Messages
+namespace Luno.Client.Websocket.Models
 {
 	/// <summary>
 	/// Base class for all messages.
 	/// </summary>
-	public abstract record MessageBase
+	public abstract record Message
 	{
 		/// <summary>
 		/// The message sequence number.
@@ -16,7 +17,16 @@ namespace Luno.Client.Websocket.Messages
 
 		internal static bool TryHandle<TResponse>(JsonElement response, ISubject<TResponse> subject)
 		{
-			var value = response.ToObject<TResponse>(LunoJsonOptions.Default);
+			TResponse? value;
+			try
+			{
+				value = response.ToObject<TResponse>(LunoJsonOptions.Default);
+			}
+			catch (Exception exception)
+			{
+				throw new Exception($"Failed to deserialize JSON: {JsonSerializer.Serialize(response)}", exception);
+			}
+
 			if (value != null)
 			{
 				subject.OnNext(value);

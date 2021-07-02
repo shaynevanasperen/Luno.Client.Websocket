@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Luno.Client.Websocket.Json;
-using Luno.Client.Websocket.Messages;
+using Luno.Client.Websocket.Models;
 
 namespace Luno.Client.Websocket.Responses
 {
 	/// <summary>
 	/// Order book snapshot message.
 	/// </summary>
-	public record OrderBookSnapshotResponse : MessageBase
+	public record OrderBookSnapshotResponse : Message
 	{
 		/// <summary>
 		/// The asks.
@@ -51,6 +51,6 @@ namespace Luno.Client.Websocket.Responses
 		/// <summary>
 		/// The volume.
 		/// </summary>
-		public double Volume { get; init; }
+		public double Volume { get; set; }
 	}
 }
