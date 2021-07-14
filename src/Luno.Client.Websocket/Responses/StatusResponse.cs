@@ -1,13 +1,9 @@
+using Luno.Client.Websocket.Models;
+
 namespace Luno.Client.Websocket.Responses
 {
 	/// <summary>
 	/// Status message.
 	/// </summary>
-	public record StatusResponse
-	{
-		/// <summary>
-		/// The status.
-		/// </summary>
-		public string Status { get; init; } = null!;
-	}
+	public record StatusResponse : PairStatus;
 }

@@ -22,19 +22,21 @@ namespace Luno.Client.Websocket.Client
 		/// </summary>
 		public LunoClientStreams()
 		{
+			OrderBookSnapshotStream.Subscribe(response => StatusSubject.OnNext(new StatusResponse
+			{
+				Status = response.Status
+			}));
+
 			OrderBookDiffStream.Subscribe(response =>
 			{
 				foreach (var tradeUpdate in response.TradeUpdates)
 				{
 					TradeSubject.OnNext(new TradeResponse
 					{
-						OrderId = tradeUpdate.MakerOrderId,
-						Volume = tradeUpdate.Base
-					});
-					TradeSubject.OnNext(new TradeResponse
-					{
-						OrderId = tradeUpdate.TakerOrderId,
-						Volume = tradeUpdate.Base
+						MakerOrderId = tradeUpdate.MakerOrderId,
+						TakerOrderId = tradeUpdate.TakerOrderId,
+						Base = tradeUpdate.Base,
+						Counter = tradeUpdate.Counter
 					});
 				}
 				if (response.StatusUpdate != null)
@@ -61,7 +63,7 @@ namespace Luno.Client.Websocket.Client
 		public IObservable<OrderBookSnapshotResponse> OrderBookSnapshotStream => OrderBookSnapshotSubject.AsObservable();
 
 		/// <summary>
-		/// Order book diff stream - emits ever time order book changes
+		/// Order book diff stream - emits every time order book changes
 		/// </summary>
 		public IObservable<OrderBookDiffResponse> OrderBookDiffStream => OrderBookDiffSubject.AsObservable();
 
