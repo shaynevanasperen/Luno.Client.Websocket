@@ -1,9 +1,8 @@
 using System;
-using System.Net.WebSockets;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Luno.Client.Websocket.Json;
 using Luno.Client.Websocket.Models;
-using Luno.Client.Websocket.Requests;
 using Luno.Client.Websocket.Responses;
 using Websocket.Client;
 
@@ -15,52 +14,25 @@ namespace Luno.Client.Websocket.Client
 	/// </summary>
 	public class LunoWebsocketClient : IDisposable
 	{
-		/// <summary>
-		/// Creates a real live websocket connection to Luno.
-		/// </summary>
-		/// <param name="pair">The trading pair with which all messages are concerned.</param>
-		/// <param name="secrets">The secrets.</param>
-		/// <returns>A connected Luno websocket client.</returns>
-		public static LunoWebsocketClient Create(string pair, LunoSecrets secrets)
-		{
-			const string baseAddress = "wss://ws.luno.com/api/1/stream/";
-
-			var websocketClient = new WebsocketClient(new Uri($"{baseAddress}{pair}", UriKind.Absolute), () => new ClientWebSocket()
-				.WithKeepAliveInterval(TimeSpan.FromSeconds(3)))
-			{
-				Name = $"Luno ({pair})"
-			};
-
-			var client = new LunoWebsocketClient(websocketClient, pair);
-
-			websocketClient.ReconnectionHappened.Subscribe(_ => client.Send(new AuthenticationRequest(secrets.ApiKey, secrets.ApiSecret)));
-
-			return client;
-		}
-
+		readonly IWebsocketClient _client;
 		readonly IDisposable _clientMessageReceivedSubscription;
 
 		/// <summary>
 		/// Creates a new instance.
 		/// </summary>
 		/// <param name="client">The client to use for the websocket.</param>
-		/// <param name="targetPair">The target pair.</param>
-		public LunoWebsocketClient(IWebsocketClient client, string targetPair)
+		/// <param name="pair">The target pair.</param>
+		public LunoWebsocketClient(IWebsocketClient client, string pair)
 		{
-			Client = client;
-			TargetPair = targetPair;
-			_clientMessageReceivedSubscription = Client.MessageReceived.Subscribe(HandleMessage);
+			_client = client;
+			Pair = pair;
+			_clientMessageReceivedSubscription = _client.MessageReceived.Subscribe(HandleMessage);
 		}
-
-		/// <summary>
-		/// The websocket client.
-		/// </summary>
-		public IWebsocketClient Client { get; }
 
 		/// <summary>
 		/// The trading pair with which all messages are concerned.
 		/// </summary>
-		public string TargetPair { get; }
+		public string Pair { get; }
 
 		/// <summary>
 		/// Provided message streams
@@ -79,8 +51,16 @@ namespace Luno.Client.Websocket.Client
 		public void Send<T>(T request)
 		{
 			var serialized = JsonSerializer.Serialize(request, LunoJsonOptions.Default);
-			Client.Send(serialized);
+			_client.Send(serialized);
 		}
+
+		/// <summary>
+		/// Closes current websocket stream and perform a new connection to the server.
+		/// In case of connection error it doesn't throw an exception, but tries to reconnect indefinitely.
+		/// Use this method in combination with a subscription to `ReconnectionHappened` which sends the authentication request,
+		/// thus triggering a new snapshot to be sent from the server so that consumers can rebuild the orderbook from scratch.
+		/// </summary>
+		public Task Reconnect() => _client.Reconnect();
 
 		void HandleMessage(ResponseMessage message)
 		{
