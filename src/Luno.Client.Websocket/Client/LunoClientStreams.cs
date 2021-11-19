@@ -70,6 +70,6 @@ namespace Luno.Client.Websocket.Client
 		/// <summary>
 		/// Trade stream - emits for every trade that occurs
 		/// </summary>
-		public IObservable<OrderBookDiffResponse> TradeStream => OrderBookDiffSubject.AsObservable();
+		public IObservable<TradeResponse> TradeStream => TradeSubject.AsObservable();
 	}
 }

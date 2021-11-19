@@ -5,7 +5,7 @@ namespace Luno.Client.Websocket.Json
 {
 	static class LunoJsonOptions
 	{
-		public static JsonSerializerOptions Default = new(JsonSerializerDefaults.Web)
+		public static readonly JsonSerializerOptions Default = new(JsonSerializerDefaults.Web)
 		{
 			PropertyNamingPolicy = SnakeCaseNamingPolicy.Instance
 		};
