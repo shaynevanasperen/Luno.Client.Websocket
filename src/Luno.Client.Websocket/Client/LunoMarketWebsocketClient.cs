@@ -9,10 +9,10 @@ using Websocket.Client;
 namespace Luno.Client.Websocket.Client
 {
 	/// <summary>
-	/// Luno websocket client.
+	/// Luno market websocket client.
 	/// Use `Streams` to handle messages.
 	/// </summary>
-	public class LunoWebsocketClient : IDisposable
+	public class LunoMarketWebsocketClient : IDisposable
 	{
 		readonly IWebsocketClient _client;
 		readonly IDisposable _clientMessageReceivedSubscription;
@@ -22,7 +22,7 @@ namespace Luno.Client.Websocket.Client
 		/// </summary>
 		/// <param name="client">The client to use for the websocket.</param>
 		/// <param name="pair">The target pair.</param>
-		public LunoWebsocketClient(IWebsocketClient client, string pair)
+		public LunoMarketWebsocketClient(IWebsocketClient client, string pair)
 		{
 			_client = client;
 			Pair = pair;
@@ -37,7 +37,7 @@ namespace Luno.Client.Websocket.Client
 		/// <summary>
 		/// Provided message streams
 		/// </summary>
-		public LunoClientStreams Streams { get; } = new();
+		public LunoMarketClientStreams Streams { get; } = new();
 
 		/// <summary>
 		/// Cleanup everything

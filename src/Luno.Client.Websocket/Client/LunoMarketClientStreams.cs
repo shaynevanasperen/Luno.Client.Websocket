@@ -9,7 +9,7 @@ namespace Luno.Client.Websocket.Client
 	/// All provided streams.
 	/// You don't need to send subscription request in advance (all are subscribed to by default)
 	/// </summary>
-	public class LunoClientStreams
+	public class LunoMarketClientStreams
 	{
 		internal readonly Subject<KeepAliveResponse> KeepAliveSubject = new();
 		internal readonly Subject<StatusResponse> StatusSubject = new();
@@ -20,7 +20,7 @@ namespace Luno.Client.Websocket.Client
 		/// <summary>
 		/// Creates a new instance.
 		/// </summary>
-		public LunoClientStreams()
+		public LunoMarketClientStreams()
 		{
 			OrderBookSnapshotStream.Subscribe(response => StatusSubject.OnNext(new StatusResponse
 			{

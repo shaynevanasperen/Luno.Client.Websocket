@@ -6,8 +6,13 @@ namespace Luno.Client.Websocket
 	public static class LunoValues
 	{
 		/// <summary>
-		/// Main Luno url to websocket API
+		/// Luno url to websocket API for a particular market
 		/// </summary>
-		public const string ApiWebsocketUrl = "wss://ws.luno.com/api/1/stream/";
+		public static string ApiMarketWebsocketUrl(string pair) => $"wss://ws.luno.com/api/1/stream/{pair}";
+
+		/// <summary>
+		/// Luno url to websocket API for user account
+		/// </summary>
+		public const string ApiUserWebsocketUrl = "wss://ws.luno.com/api/1/userstream";
 	}
 }
