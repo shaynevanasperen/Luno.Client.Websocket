@@ -20,7 +20,7 @@ namespace Luno.Client.Websocket.Models
 			TResponse? value;
 			try
 			{
-				value = response.ToObject<TResponse>(LunoJsonOptions.Default);
+				value = response.Deserialize<TResponse>(LunoJsonOptions.Default);
 			}
 			catch (Exception exception)
 			{

@@ -1,9 +1,9 @@
-namespace Luno.Client.Websocket.Responses
+namespace Luno.Client.Websocket.Models
 {
 	/// <summary>
-	/// Order status message.
+	/// Order status update.
 	/// </summary>
-	public record OrderStatusResponse
+	public record OrderStatusUpdate
 	{
 		/// <summary>
 		/// Order Id.

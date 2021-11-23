@@ -84,12 +84,9 @@ namespace Luno.Client.Websocket.Client
 		{
 			var response = JsonSerializer.Deserialize<JsonElement>(message, LunoJsonOptions.Default);
 
-			if (response.TryGetProperty("status", out _))
-				return Message.TryHandle(response, Streams.OrderStatusSubject);
-
-			if (response.TryGetProperty("base_fill", out _))
-				return Message.TryHandle(response, Streams.OrderFillSubject);
-
+			if (response.TryGetProperty("type", out var type) && type.GetString() is "order_status" or "order_fill")
+				return Message.TryHandle(response, Streams.OrderUpdateSubject);
+			
 			return Message.TryHandle(response, Streams.KeepAliveSubject);
 		}
 	}

@@ -12,22 +12,16 @@ namespace Luno.Client.Websocket.Client
 	public class LunoUserClientStreams
 	{
 		internal readonly Subject<KeepAliveResponse> KeepAliveSubject = new();
-		internal readonly Subject<OrderStatusResponse> OrderStatusSubject = new();
-		internal readonly Subject<OrderFillResponse> OrderFillSubject = new();
+		internal readonly Subject<OrderUpdateResponse> OrderUpdateSubject = new();
 
 		/// <summary>
 		/// Keep alive stream - emits regularly to keep the connection alive
 		/// </summary>
-		public IObservable<OrderStatusResponse> KeepAliveStream => OrderStatusSubject.AsObservable();
+		public IObservable<KeepAliveResponse> KeepAliveStream => KeepAliveSubject.AsObservable();
 
 		/// <summary>
 		/// Order status stream - emits when order status changes
 		/// </summary>
-		public IObservable<OrderFillResponse> OrderStatusStream => OrderFillSubject.AsObservable();
-
-		/// <summary>
-		/// Order fill stream - emits when new order fills occur
-		/// </summary>
-		public IObservable<OrderFillResponse> OrderFillStream => OrderFillSubject.AsObservable();
+		public IObservable<OrderUpdateResponse> OrderUpdateStream => OrderUpdateSubject.AsObservable();
 	}
 }
