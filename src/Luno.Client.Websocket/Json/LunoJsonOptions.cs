@@ -1,20 +1,19 @@
 using System.Linq;
 using System.Text.Json;
 
-namespace Luno.Client.Websocket.Json
+namespace Luno.Client.Websocket.Json;
+
+static class LunoJsonOptions
 {
-	static class LunoJsonOptions
+	public static readonly JsonSerializerOptions Default = new(JsonSerializerDefaults.Web)
 	{
-		public static readonly JsonSerializerOptions Default = new(JsonSerializerDefaults.Web)
-		{
-			PropertyNamingPolicy = SnakeCaseNamingPolicy.Instance
-		};
-	}
+		PropertyNamingPolicy = SnakeCaseNamingPolicy.Instance
+	};
+}
 
-	class SnakeCaseNamingPolicy : JsonNamingPolicy
-	{
-		public static SnakeCaseNamingPolicy Instance { get; } = new();
+class SnakeCaseNamingPolicy : JsonNamingPolicy
+{
+	public static SnakeCaseNamingPolicy Instance { get; } = new();
 
-		public override string ConvertName(string name) => string.Concat(name.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x : x.ToString())).ToLower();
-	}
+	public override string ConvertName(string name) => string.Concat(name.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x : x.ToString())).ToLower();
 }

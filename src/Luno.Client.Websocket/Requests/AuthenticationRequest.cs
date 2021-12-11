@@ -1,27 +1,26 @@
-namespace Luno.Client.Websocket.Requests
+namespace Luno.Client.Websocket.Requests;
+
+/// <summary>
+/// Authentication message.
+/// </summary>
+public record AuthenticationRequest
 {
 	/// <summary>
-	/// Authentication message.
+	/// Creates a new instance.
 	/// </summary>
-	public record AuthenticationRequest
+	public AuthenticationRequest(string apiKeyId, string apiKeySecret)
 	{
-		/// <summary>
-		/// Creates a new instance.
-		/// </summary>
-		public AuthenticationRequest(string apiKeyId, string apiKeySecret)
-		{
-			ApiKeyId = apiKeyId;
-			ApiKeySecret = apiKeySecret;
-		}
-
-		/// <summary>
-		/// The API key.
-		/// </summary>
-		public string ApiKeyId { get; }
-
-		/// <summary>
-		/// The API secret.
-		/// </summary>
-		public string ApiKeySecret { get; }
+		ApiKeyId = apiKeyId;
+		ApiKeySecret = apiKeySecret;
 	}
+
+	/// <summary>
+	/// The API key.
+	/// </summary>
+	public string ApiKeyId { get; }
+
+	/// <summary>
+	/// The API secret.
+	/// </summary>
+	public string ApiKeySecret { get; }
 }
