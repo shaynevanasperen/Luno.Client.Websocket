@@ -1,5 +1,5 @@
 using System.Reactive.Subjects;
-using Luno.Client.Websocket.Responses;
+using Luno.Client.Websocket.Models;
 
 namespace Luno.Client.Websocket.Client;
 
@@ -12,5 +12,15 @@ public class LunoUserClientStreams : LunoClientStreams
 	/// <summary>
 	/// Order status stream - emits when order status changes
 	/// </summary>
-	public readonly Subject<OrderUpdateResponse> OrderUpdateStream = new();
+	public readonly Subject<OrderStatusUpdate> OrderStatusUpdateStream = new();
+
+	/// <summary>
+	/// Order fill stream - emits when order fill changes
+	/// </summary>
+	public readonly Subject<OrderFillUpdate> OrderFillUpdateStream = new();
+
+	/// <summary>
+	/// Balance update stream - emits when balance changes
+	/// </summary>
+	public readonly Subject<BalanceUpdate> BalanceUpdateStream = new();
 }

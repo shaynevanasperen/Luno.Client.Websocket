@@ -25,8 +25,19 @@ public class LunoUserWebsocketClient : LunoWebsocketClient<LunoUserClientStreams
 	{
 		var response = JsonSerializer.Deserialize<JsonElement>(message, LunoJsonOptions.Default);
 
-		if (response.TryGetProperty("type", out var type) && type.GetString() is "order_status" or "order_fill")
-			return Message.TryHandle(response, Streams.OrderUpdateStream);
+		if (response.TryGetProperty("type", out var type))
+		{
+			var update = type.GetString();
+
+			if (update == "order_status")
+				return Message.TryHandle(response.GetProperty("order_status_update"), Streams.OrderStatusUpdateStream);
+
+			if (update == "order_fill")
+				return Message.TryHandle(response.GetProperty("order_fill_update"), Streams.OrderFillUpdateStream);
+
+			if (update == "balance_update")
+				return Message.TryHandle(response.GetProperty("balance_update"), Streams.BalanceUpdateStream);
+		}
 
 		return false;
 	}
