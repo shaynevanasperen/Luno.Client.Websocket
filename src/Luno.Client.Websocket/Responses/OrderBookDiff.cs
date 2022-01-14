@@ -9,7 +9,7 @@ namespace Luno.Client.Websocket.Responses;
 /// <summary>
 /// Order book snapshot message.
 /// </summary>
-public record OrderBookDiffResponse : Message
+public record OrderBookDiff : SequencedMessage
 {
 	/// <summary>
 	/// The asks.

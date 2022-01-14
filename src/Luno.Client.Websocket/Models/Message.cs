@@ -6,15 +6,10 @@ using Luno.Client.Websocket.Json;
 namespace Luno.Client.Websocket.Models;
 
 /// <summary>
-/// Base class for all messages.
+/// Base class for all sequenced messages.
 /// </summary>
-public abstract record Message
+static class Message
 {
-	/// <summary>
-	/// The message sequence number.
-	/// </summary>
-	public long Sequence { get; set; }
-
 	internal static bool TryHandle<TResponse>(JsonElement response, ISubject<TResponse> subject)
 	{
 		TResponse? value;

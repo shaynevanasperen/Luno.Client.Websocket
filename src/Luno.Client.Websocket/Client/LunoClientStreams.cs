@@ -11,5 +11,5 @@ public abstract class LunoClientStreams
 	/// <summary>
 	/// Keep alive stream - emits regularly to keep the connection alive
 	/// </summary>
-	public readonly Subject<KeepAliveResponse> KeepAliveStream = new();
+	public readonly Subject<KeepAlive> KeepAliveStream = new();
 }

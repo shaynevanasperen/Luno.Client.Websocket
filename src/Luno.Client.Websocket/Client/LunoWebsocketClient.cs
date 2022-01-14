@@ -73,7 +73,7 @@ public abstract class LunoWebsocketClient<TStreams> : IDisposable where TStreams
 
 			if (messageSafe.Length == 0 || messageSafe == @"""""")
 			{
-				Streams.KeepAliveStream.OnNext(new KeepAliveResponse());
+				Streams.KeepAliveStream.OnNext(new KeepAlive());
 				return;
 			}
 			if (messageSafe.StartsWith("{", StringComparison.OrdinalIgnoreCase))
