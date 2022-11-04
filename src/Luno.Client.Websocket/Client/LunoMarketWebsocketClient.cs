@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Luno.Client.Websocket.Json;
 using Luno.Client.Websocket.Models;
+using Luno.Client.Websocket.Responses;
 using Microsoft.Extensions.Logging;
 using Websocket.Client;
 
@@ -11,7 +12,7 @@ namespace Luno.Client.Websocket.Client;
 /// Luno market websocket client.
 /// Use `Streams` to handle messages.
 /// </summary>
-public class LunoMarketWebsocketClient : LunoWebsocketClient<LunoMarketClientStreams>, ILunoMarketWebsocketClient
+public class LunoMarketWebsocketClient : LunoWebsocketClient, ILunoMarketWebsocketClient
 {
 	/// <summary>
 	/// Creates a new instance.
@@ -33,7 +34,13 @@ public class LunoMarketWebsocketClient : LunoWebsocketClient<LunoMarketClientStr
 	/// <summary>
 	/// Provided message streams
 	/// </summary>
-	public override LunoMarketClientStreams Streams { get; } = new();
+	public LunoMarketClientStreams Streams { get; } = new();
+
+	/// <inheritdoc />
+	protected override void HandleEmptyMessage()
+	{
+		Streams.KeepAliveStream.OnNext(new KeepAlive());
+	}
 
 	/// <inheritdoc />
 	protected override bool HandleObjectMessage(string message)

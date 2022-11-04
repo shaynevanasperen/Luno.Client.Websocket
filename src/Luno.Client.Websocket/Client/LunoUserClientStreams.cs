@@ -7,7 +7,7 @@ namespace Luno.Client.Websocket.Client;
 /// All provided streams.
 /// You don't need to send subscription request in advance (all are subscribed to by default).
 /// </summary>
-public class LunoUserClientStreams : LunoClientStreams
+public class LunoUserClientStreams
 {
 	/// <summary>
 	/// Order status stream - emits when order status changes

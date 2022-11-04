@@ -9,7 +9,7 @@ namespace Luno.Client.Websocket.Client;
 /// All provided streams.
 /// You don't need to send subscription request in advance (all are subscribed to by default).
 /// </summary>
-public class LunoMarketClientStreams : LunoClientStreams
+public class LunoMarketClientStreams
 {
 	/// <summary>
 	/// Creates a new instance.
@@ -40,6 +40,11 @@ public class LunoMarketClientStreams : LunoClientStreams
 				});
 		});
 	}
+
+	/// <summary>
+	/// Keep alive stream - emits regularly to keep the connection alive
+	/// </summary>
+	public readonly Subject<KeepAlive> KeepAliveStream = new();
 
 	/// <summary>
 	/// Status stream - emits when the trading status changes.

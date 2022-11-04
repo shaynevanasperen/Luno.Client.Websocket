@@ -10,7 +10,7 @@ namespace Luno.Client.Websocket.Client;
 /// Luno account websocket client.
 /// Use `Streams` to handle messages.
 /// </summary>
-public class LunoUserWebsocketClient : LunoWebsocketClient<LunoUserClientStreams>, ILunoUserWebsocketClient
+public class LunoUserWebsocketClient : LunoWebsocketClient, ILunoUserWebsocketClient
 {
 	/// <inheritdoc />
 	public LunoUserWebsocketClient(ILogger logger, IWebsocketClient client) : base(logger, client, "USER") { }
@@ -18,7 +18,7 @@ public class LunoUserWebsocketClient : LunoWebsocketClient<LunoUserClientStreams
 	/// <summary>
 	/// Provided message streams
 	/// </summary>
-	public override LunoUserClientStreams Streams { get; } = new();
+	public LunoUserClientStreams Streams { get; } = new();
 
 	/// <inheritdoc />
 	protected override bool HandleObjectMessage(string message)

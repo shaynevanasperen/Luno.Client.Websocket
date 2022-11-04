@@ -1,7 +1,6 @@
 using System;
 using System.Text.Json;
 using Luno.Client.Websocket.Json;
-using Luno.Client.Websocket.Responses;
 using Microsoft.Extensions.Logging;
 using Websocket.Client;
 
@@ -11,7 +10,7 @@ namespace Luno.Client.Websocket.Client;
 /// Luno market websocket client.
 /// Use `Streams` to handle messages.
 /// </summary>
-public abstract class LunoWebsocketClient<TStreams> : IDisposable where TStreams : LunoClientStreams
+public abstract class LunoWebsocketClient : IDisposable
 {
 	readonly ILogger _logger;
 
@@ -36,11 +35,6 @@ public abstract class LunoWebsocketClient<TStreams> : IDisposable where TStreams
 	/// The underlying websocket client.
 	/// </summary>
 	protected IWebsocketClient Client { get; }
-
-	/// <summary>
-	/// Provided message streams.
-	/// </summary>
-	public abstract TStreams Streams { get; }
 
 	/// <summary>
 	/// Cleanup everything
@@ -73,7 +67,7 @@ public abstract class LunoWebsocketClient<TStreams> : IDisposable where TStreams
 
 			if (messageSafe.Length == 0 || messageSafe == @"""""")
 			{
-				Streams.KeepAliveStream.OnNext(new KeepAlive());
+				HandleEmptyMessage();
 				return;
 			}
 			if (messageSafe.StartsWith("{", StringComparison.OrdinalIgnoreCase))
@@ -89,6 +83,11 @@ public abstract class LunoWebsocketClient<TStreams> : IDisposable where TStreams
 	}
 
 	string LogMessage(string message) => $"[LUNO {_type} WEBSOCKET CLIENT] {message}";
+
+	/// <summary>
+	/// Handles the message and publishes new stream elements.
+	/// </summary>
+	protected virtual void HandleEmptyMessage() { }
 
 	/// <summary>
 	/// Handles the message and publishes new stream elements.

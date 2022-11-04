@@ -16,42 +16,42 @@ public record OrderFillUpdate
 	public string MarketId { get; init; } = null!;
 
 	/// <summary>
-	/// Status.
+	/// Base Fill.
 	/// </summary>
 	public double BaseFill { get; init; }
 
 	/// <summary>
-	/// Status.
+	/// Counter Fill.
 	/// </summary>
 	public double CounterFill { get; init; }
 
 	/// <summary>
-	/// Status.
+	/// Base Delta.
 	/// </summary>
 	public double BaseDelta { get; init; }
 
 	/// <summary>
-	/// Status.
+	/// Counter Delta.
 	/// </summary>
 	public double CounterDelta { get; init; }
 
 	/// <summary>
-	/// Status.
+	/// Base Fee.
 	/// </summary>
 	public double BaseFee { get; init; }
 
 	/// <summary>
-	/// Status.
+	/// Counter Fee.
 	/// </summary>
 	public double CounterFee { get; init; }
 
 	/// <summary>
-	/// Status.
+	/// Base Fee Delta.
 	/// </summary>
 	public double BaseFeeDelta { get; init; }
 
 	/// <summary>
-	/// Status.
+	/// Counter Fee Delta.
 	/// </summary>
 	public double CounterFeeDelta { get; init; }
 }
