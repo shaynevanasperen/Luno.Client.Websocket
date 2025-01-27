@@ -70,6 +70,7 @@ public abstract class LunoWebsocketClient : IDisposable
 				HandleEmptyMessage();
 				return;
 			}
+
 			if (messageSafe.StartsWith("{", StringComparison.OrdinalIgnoreCase))
 				if (HandleObjectMessage(messageSafe))
 					return;
@@ -93,6 +94,6 @@ public abstract class LunoWebsocketClient : IDisposable
 	/// Handles the message and publishes new stream elements.
 	/// </summary>
 	/// <param name="message">The message to handle.</param>
-	/// <returns>A boolean value to signify whether or not the message could be handled.</returns>
+	/// <returns>A boolean value to signify whether the message could be handled.</returns>
 	protected abstract bool HandleObjectMessage(string message);
 }

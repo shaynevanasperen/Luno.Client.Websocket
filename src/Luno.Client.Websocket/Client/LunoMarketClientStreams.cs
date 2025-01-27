@@ -1,4 +1,3 @@
-using System;
 using System.Reactive.Subjects;
 using Luno.Client.Websocket.Models;
 using Luno.Client.Websocket.Responses;
@@ -11,36 +10,6 @@ namespace Luno.Client.Websocket.Client;
 /// </summary>
 public class LunoMarketClientStreams
 {
-	/// <summary>
-	/// Creates a new instance.
-	/// </summary>
-	public LunoMarketClientStreams()
-	{
-		OrderBookSnapshotStream.Subscribe(response => StatusStream.OnNext(new PairStatus
-		{
-			Status = response.Status
-		}));
-
-		OrderBookDiffStream.Subscribe(response =>
-		{
-			foreach (var tradeUpdate in response.TradeUpdates)
-			{
-				TradeStream.OnNext(new Trade
-				{
-					MakerOrderId = tradeUpdate.MakerOrderId,
-					TakerOrderId = tradeUpdate.TakerOrderId,
-					Base = tradeUpdate.Base,
-					Counter = tradeUpdate.Counter
-				});
-			}
-			if (response.StatusUpdate != null)
-				StatusStream.OnNext(new PairStatus
-				{
-					Status = response.StatusUpdate.Status
-				});
-		});
-	}
-
 	/// <summary>
 	/// Keep alive stream - emits regularly to keep the connection alive
 	/// </summary>

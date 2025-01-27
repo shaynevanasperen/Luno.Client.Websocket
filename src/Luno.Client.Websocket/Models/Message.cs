@@ -12,15 +12,7 @@ static class Message
 {
 	internal static bool TryHandle<TResponse>(JsonElement response, ISubject<TResponse> subject)
 	{
-		TResponse? value;
-		try
-		{
-			value = response.Deserialize<TResponse>(LunoJsonOptions.Default);
-		}
-		catch (Exception exception)
-		{
-			throw new Exception($"Failed to deserialize JSON: {JsonSerializer.Serialize(response)}", exception);
-		}
+		var value = TryDeserialize<TResponse>(response);
 
 		if (value != null)
 		{
@@ -29,5 +21,17 @@ static class Message
 		}
 
 		return false;
+	}
+
+	internal static TResponse? TryDeserialize<TResponse>(JsonElement response)
+	{
+		try
+		{
+			return response.Deserialize<TResponse>(LunoJsonOptions.Default);
+		}
+		catch (Exception exception)
+		{
+			throw new($"Failed to deserialize JSON: {JsonSerializer.Serialize(response)}", exception);
+		}
 	}
 }

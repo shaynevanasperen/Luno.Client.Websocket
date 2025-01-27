@@ -14,7 +14,7 @@ public record OrderBookDiff : SequencedMessage
 	/// <summary>
 	/// The asks.
 	/// </summary>
-	public IReadOnlyList<Trade> TradeUpdates { get; init; } = Array.Empty<Trade>();
+	public IReadOnlyList<Trade> TradeUpdates { get; init; } = [];
 
 	/// <summary>
 	/// The create update.

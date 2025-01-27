@@ -12,21 +12,17 @@ namespace Luno.Client.Websocket.Client;
 /// Luno market websocket client.
 /// Use `Streams` to handle messages.
 /// </summary>
-public class LunoMarketWebsocketClient : LunoWebsocketClient, ILunoMarketWebsocketClient
+/// <remarks>
+/// Creates a new instance.
+/// </remarks>
+/// <param name="logger">The logger to use for logging any errors.</param>
+/// <param name="client">The client to use for the trade websocket.</param>
+/// <param name="pair">The target pair.</param>
+public class LunoMarketWebsocketClient(ILogger logger, IWebsocketClient client, string pair) : LunoWebsocketClient(logger, client, "MARKET"), ILunoMarketWebsocketClient
 {
-	/// <summary>
-	/// Creates a new instance.
-	/// </summary>
-	/// <param name="logger">The logger to use for logging any errors.</param>
-	/// <param name="client">The client to use for the trade websocket.</param>
-	/// <param name="pair">The target pair.</param>
-	public LunoMarketWebsocketClient(ILogger logger, IWebsocketClient client, string pair) : base(logger, client, "MARKET")
-	{
-		Pair = pair;
-	}
 
 	/// <inheritdoc />
-	public string Pair { get; }
+	public string Pair { get; } = pair;
 
 	/// <inheritdoc />
 	public Task Reconnect() => Client.Reconnect();
@@ -37,10 +33,7 @@ public class LunoMarketWebsocketClient : LunoWebsocketClient, ILunoMarketWebsock
 	public LunoMarketClientStreams Streams { get; } = new();
 
 	/// <inheritdoc />
-	protected override void HandleEmptyMessage()
-	{
-		Streams.KeepAliveStream.OnNext(new KeepAlive());
-	}
+	protected override void HandleEmptyMessage() => Streams.KeepAliveStream.OnNext(new());
 
 	/// <inheritdoc />
 	protected override bool HandleObjectMessage(string message)
@@ -48,10 +41,48 @@ public class LunoMarketWebsocketClient : LunoWebsocketClient, ILunoMarketWebsock
 		var response = JsonSerializer.Deserialize<JsonElement>(message, LunoJsonOptions.Default);
 
 		if (response.TryGetProperty("trade_updates", out _))
-			return Message.TryHandle(response, Streams.OrderBookDiffStream);
+		{
+			var diffResponse = Message.TryDeserialize<OrderBookDiff>(response);
+			if (diffResponse == null)
+				return false;
+
+			if (diffResponse.StatusUpdate != null)
+				Streams.StatusStream.OnNext(new()
+				{
+					Status = diffResponse.StatusUpdate.Status
+				});
+
+			foreach (var tradeUpdate in diffResponse.TradeUpdates)
+			{
+				Streams.TradeStream.OnNext(new()
+				{
+					MakerOrderId = tradeUpdate.MakerOrderId,
+					TakerOrderId = tradeUpdate.TakerOrderId,
+					Base = tradeUpdate.Base,
+					Counter = tradeUpdate.Counter
+				});
+			}
+
+			Streams.OrderBookDiffStream.OnNext(diffResponse);
+
+			return true;
+		}
 
 		if (response.TryGetProperty("asks", out _))
-			return Message.TryHandle(response, Streams.OrderBookSnapshotStream);
+		{
+			var snapshotResponse = Message.TryDeserialize<OrderBookSnapshot>(response);
+			if (snapshotResponse == null)
+				return false;
+
+			Streams.StatusStream.OnNext(new()
+			{
+				Status = snapshotResponse.Status
+			});
+
+			Streams.OrderBookSnapshotStream.OnNext(snapshotResponse);
+
+			return true;
+		}
 
 		return false;
 	}

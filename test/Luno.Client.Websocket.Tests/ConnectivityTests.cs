@@ -13,21 +13,16 @@ using Xunit.Abstractions;
 
 namespace Luno.Client.Websocket.Tests;
 
-public class ConnectivityTests
+public class ConnectivityTests(ITestOutputHelper outputHelper)
 {
-	readonly ILogger _logger;
-
-	public ConnectivityTests(ITestOutputHelper outputHelper)
-	{
-		_logger = new XUnitLogger(nameof(ConnectivityTests), outputHelper, new XUnitLoggerOptions());
-	}
+	readonly ILogger _logger = new XUnitLogger(nameof(ConnectivityTests), outputHelper, new());
 
 	[IntegrationBddfyFact]
 	async Task ConnectingToUserWebsocketWorks()
 	{
 		var semaphore = new SemaphoreSlim(0, 1);
 
-		var connection = new WebsocketClient(new Uri(LunoValues.ApiUserWebsocketUrl, UriKind.Absolute), () => new ClientWebSocket()
+		var connection = new WebsocketClient(new(LunoValues.ApiUserWebsocketUrl, UriKind.Absolute), () => new ClientWebSocket()
 			.WithDefaultKeepAliveInterval())
 		{
 			Name = "User",
@@ -56,7 +51,7 @@ public class ConnectivityTests
 		var semaphore = new SemaphoreSlim(0, 1);
 
 		const string pair = "XBTZAR";
-		var connection = new WebsocketClient(new Uri(LunoValues.ApiMarketWebsocketUrl(pair), UriKind.Absolute), () => new ClientWebSocket()
+		var connection = new WebsocketClient(new(LunoValues.ApiMarketWebsocketUrl(pair), UriKind.Absolute), () => new ClientWebSocket()
 			.WithDefaultKeepAliveInterval())
 		{
 			Name = "Market",
