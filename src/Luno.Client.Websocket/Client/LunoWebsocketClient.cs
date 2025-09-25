@@ -7,14 +7,12 @@ using Websocket.Client;
 namespace Luno.Client.Websocket.Client;
 
 /// <summary>
-/// Luno market websocket client.
-/// Use `Streams` to handle messages.
+/// Luno websocket client.
 /// </summary>
 public abstract class LunoWebsocketClient : IDisposable
 {
 	readonly ILogger _logger;
 
-	readonly string _type;
 	readonly IDisposable _clientMessageReceivedSubscription;
 
 	/// <summary>
@@ -22,14 +20,17 @@ public abstract class LunoWebsocketClient : IDisposable
 	/// </summary>
 	/// <param name="logger">The logger to use for logging any warnings or errors.</param>
 	/// <param name="client">The client to use for the trade websocket.</param>
-	/// <param name="type">The type of websocket client (MARKET or USER).</param>
-	protected LunoWebsocketClient(ILogger logger, IWebsocketClient client, string type)
+	protected LunoWebsocketClient(ILogger logger, IWebsocketClient client)
 	{
 		_logger = logger;
 		Client = client;
-		_type = type;
 		_clientMessageReceivedSubscription = Client.MessageReceived.Subscribe(HandleMessage);
 	}
+
+	/// <summary>
+	/// The type of the websocket client (MARKET or USER).
+	/// </summary>
+	protected abstract string Type { get; }
 
 	/// <summary>
 	/// The underlying websocket client.
@@ -75,7 +76,7 @@ public abstract class LunoWebsocketClient : IDisposable
 				if (HandleObjectMessage(messageSafe))
 					return;
 
-			_logger.LogWarning(LogMessage($"Unhandled response:  '{messageSafe}'"));
+			_logger.LogWarning(LogMessage($"Unhandled response: '{messageSafe}'"));
 		}
 		catch (Exception e)
 		{
@@ -83,7 +84,7 @@ public abstract class LunoWebsocketClient : IDisposable
 		}
 	}
 
-	string LogMessage(string message) => $"[LUNO {_type} WEBSOCKET CLIENT] {message}";
+	string LogMessage(string message) => $"[{Client.Name ?? "LUNO " + Type} WEBSOCKET CLIENT] {message}";
 
 	/// <summary>
 	/// Handles the message and publishes new stream elements.

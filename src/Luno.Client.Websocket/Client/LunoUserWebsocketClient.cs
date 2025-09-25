@@ -10,9 +10,10 @@ namespace Luno.Client.Websocket.Client;
 /// Luno account websocket client.
 /// Use `Streams` to handle messages.
 /// </summary>
-/// <inheritdoc />
-public class LunoUserWebsocketClient(ILogger logger, IWebsocketClient client) : LunoWebsocketClient(logger, client, "USER"), ILunoUserWebsocketClient
+public class LunoUserWebsocketClient(ILogger logger, IWebsocketClient client) : LunoWebsocketClient(logger, client), ILunoUserWebsocketClient
 {
+	/// <inheritdoc />
+	protected override string Type => "USER";
 
 	/// <summary>
 	/// Provided message streams

@@ -12,14 +12,13 @@ namespace Luno.Client.Websocket.Client;
 /// Luno market websocket client.
 /// Use `Streams` to handle messages.
 /// </summary>
-/// <remarks>
-/// Creates a new instance.
-/// </remarks>
 /// <param name="logger">The logger to use for logging any errors.</param>
 /// <param name="client">The client to use for the trade websocket.</param>
 /// <param name="pair">The target pair.</param>
-public class LunoMarketWebsocketClient(ILogger logger, IWebsocketClient client, string pair) : LunoWebsocketClient(logger, client, "MARKET"), ILunoMarketWebsocketClient
+public class LunoMarketWebsocketClient(ILogger logger, IWebsocketClient client, string pair) : LunoWebsocketClient(logger, client), ILunoMarketWebsocketClient
 {
+	/// <inheritdoc />
+	protected override string Type => "MARKET";
 
 	/// <inheritdoc />
 	public string Pair { get; } = pair;
